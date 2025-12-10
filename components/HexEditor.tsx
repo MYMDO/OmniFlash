@@ -11,7 +11,7 @@ const HexEditor: React.FC<HexEditorProps> = ({ data, startAddress = 0x00000000 }
   const displayData = data.slice(0, pageSize);
 
   const rows = useMemo(() => {
-    const result = [];
+    const result: { offset: number; bytes: Uint8Array; ascii: string }[] = [];
     for (let i = 0; i < displayData.length; i += 16) {
       const chunk = displayData.slice(i, i + 16);
       result.push({
@@ -31,13 +31,14 @@ const HexEditor: React.FC<HexEditorProps> = ({ data, startAddress = 0x00000000 }
       </div>
       
       <div className="flex-1 overflow-auto p-4 custom-scrollbar">
-        <div className="grid grid-cols-[auto_1fr_auto] gap-x-6">
+        {/* Added min-w-max to ensure grid doesn't squash on small screens */}
+        <div className="grid grid-cols-[auto_1fr_auto] gap-x-4 min-w-[700px]">
           {/* Header */}
           <div className="text-brand-500 font-bold mb-2 text-xs">Offset</div>
-          <div className="text-brand-500 font-bold mb-2 text-xs grid grid-cols-16 gap-2">
+          <div className="text-brand-500 font-bold mb-2 text-xs grid grid-cols-16 gap-x-1">
             {Array.from({ length: 16 }).map((_, i) => <span key={i} className="text-center">{i.toString(16).toUpperCase().padStart(2, '0')}</span>)}
           </div>
-          <div className="text-brand-500 font-bold mb-2 text-xs">ASCII</div>
+          <div className="text-brand-500 font-bold mb-2 text-xs pl-2 border-l border-transparent">ASCII</div>
 
           {/* Rows */}
           {rows.map((row) => (
@@ -48,8 +49,8 @@ const HexEditor: React.FC<HexEditorProps> = ({ data, startAddress = 0x00000000 }
               </div>
 
               {/* Hex Bytes */}
-              <div className="grid grid-cols-16 gap-2 group">
-                {Array.from(row.bytes).map((byte, idx) => (
+              <div className="grid grid-cols-16 gap-x-1 group">
+                {Array.from(row.bytes).map((byte: number, idx) => (
                   <span 
                     key={idx} 
                     className={`text-center transition-colors cursor-pointer hover:bg-brand-900 hover:text-brand-200 rounded ${byte === 0 ? 'text-gray-700' : 'text-gray-300'}`}
@@ -62,7 +63,7 @@ const HexEditor: React.FC<HexEditorProps> = ({ data, startAddress = 0x00000000 }
               </div>
 
               {/* ASCII */}
-              <div className="text-green-600/80 tracking-widest whitespace-pre border-l border-gray-800 pl-4">
+              <div className="text-green-600/80 tracking-widest whitespace-pre border-l border-gray-800 pl-4 h-6">
                 {row.ascii}
               </div>
             </React.Fragment>
